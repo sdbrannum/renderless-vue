@@ -1,10 +1,17 @@
 <template>
-    <div id="app"></div>
+    <div id="app">
+        <FuzzyTest />
+    </div>
 </template>
 
 <script>
+import FuzzyTest from '@/components/FuzzyTest.vue';
+
 export default {
     name: 'app',
+    components: {
+        FuzzyTest,
+    },
 };
 </script>
 
