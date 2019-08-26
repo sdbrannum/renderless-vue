@@ -32,22 +32,22 @@ export default class Search {
             if (results.length > 2500) break;
             const el = data[i];
             // case sensitive equals
-            if (el.question === QUERY) {
+            if (el === QUERY) {
                 results.push({
                     rank: rankings.CASE_SENSITIVE_EQUAL,
-                    rankedItem: el.question,
+                    rankedItem: el,
                 });
                 continue;
             }
 
             // upper casing before further comparison
-            const EL_UPPER = el.question.toUpperCase();
+            const EL_UPPER = el.toUpperCase();
 
             // case insensitive equals
             if (EL_UPPER === QUERY_UPPER) {
                 results.push({
                     rank: rankings.EQUAL,
-                    rankedItem: el.question,
+                    rankedItem: el,
                 });
                 continue;
             }
@@ -56,7 +56,7 @@ export default class Search {
             if (EL_UPPER.indexOf(QUERY_UPPER) === 0) {
                 results.push({
                     rank: rankings.STARTS_WITH,
-                    rankedItem: el.question,
+                    rankedItem: el,
                 });
                 continue;
             }
@@ -65,7 +65,7 @@ export default class Search {
             if (EL_UPPER.indexOf(` ${QUERY_UPPER}`) !== -1) {
                 results.push({
                     rank: rankings.WORD_STARTS_WITH,
-                    rankedItem: el.question,
+                    rankedItem: el,
                 });
                 continue;
             }
@@ -74,7 +74,7 @@ export default class Search {
             if (EL_UPPER.indexOf(QUERY_UPPER) !== -1) {
                 results.push({
                     rank: rankings.CONTAINS,
-                    rankedItem: el.question,
+                    rankedItem: el,
                 });
             }
 
@@ -83,7 +83,7 @@ export default class Search {
             if (x.length > 0) {
                 results.push({
                     rank: rankings.SUBSEQUENCE,
-                    rankedItem: el.question,
+                    rankedItem: el,
                     distance: x.length - QUERY_UPPER.length,
                 });
                 continue;
@@ -93,6 +93,11 @@ export default class Search {
         const sortRankedItems = (a, b) => {
             if (a.rank === b.rank) {
                 if (a.rank === rankings.SUBSEQUENCE) {
+                    if (a.distance === b.distance) {
+                        return a.rankedItem
+                            .toString()
+                            .localeCompare(b.rankedItem.toString());
+                    }
                     return a.distance - b.distance;
                 }
                 return a.rankedItem
