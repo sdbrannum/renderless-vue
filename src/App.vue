@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import FuzzyTest from '@/components/FuzzyTest.vue';
+import FuzzyTest from '@/components/FuzzySearch/FuzzyTest.vue';
 
 export default {
     name: 'app',

@@ -1,6 +1,6 @@
 <template>
     <FuzzySearch :data="questions" :query="search">
-        <template v-slot="{ results, sendMessage }">
+        <template v-slot="{ results }">
             <div>
                 <input v-model="search" />
                 Results: {{ results.length }}

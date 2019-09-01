@@ -1,12 +1,11 @@
-import Worker from 'worker-loader!./FuzzySearch.worker';
+import Search from './Search';
+import Worker from 'worker-loader!./Search.worker';
+import debounce from 'lodash.debounce';
+
 export default {
     render() {
         return this.$scopedSlots.default({
             results: this.results,
-            nextPage: this.nextPage,
-            previousPage: this.previousPage,
-            currentPage: this.currentPage,
-            sendMessage: this.sendMessage,
         });
     },
     props: {
@@ -16,11 +15,10 @@ export default {
             default: () => [],
         },
         query: {
-            type: [String, Array],
+            type: String,
             required: false,
             validator(val) {
-                if (typeof val === 'string' || !val) return true;
-                return val.every(query => typeof query === 'string');
+                return typeof val === 'string' || !val;
             },
         },
         keys: {
@@ -28,8 +26,14 @@ export default {
             required: false,
             default: () => [],
         },
+        // TODO: test & fallback
+        useWorker: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
         /**
-         * Page the datq
+         * Page the data
          */
         paged: {
             type: Boolean,
@@ -40,24 +44,19 @@ export default {
             type: Number,
             required: false,
             default: 1,
+            validator(val) {
+                return typeof val === 'number' && val > 0;
+            },
         },
         pageSize: {
             type: Number,
             required: false,
-            default: -1,
+            default: 50,
         },
         threshold: {
-            type: String,
+            type: [String, Number],
             required: false,
             default: 'LCS',
-        },
-        /**
-         * LCS: Max spread
-         */
-        maxSpread: {
-            type: Number,
-            required: false,
-            default: 3,
         },
     },
     data() {
@@ -66,56 +65,41 @@ export default {
             results: [],
         };
     },
-    mounted() {
-        console.log(typeof this.data[0]);
-        this.startWorker();
-    },
     computed: {
-        currentPage() {
-            return -1;
+        searchOptions() {
+            return {
+                paged: this.paged,
+                page: this.page,
+                pageSize: this.pageSize,
+                threshold: this.threshold,
+            };
         },
     },
     watch: {
-        data() {
-            this.sendData();
-        },
-        query() {
-            this.sendQuery();
-        },
+        data() {},
+        query() {},
     },
+    created() {
+        this.search = new Search(this.data, this.searchOptions);
+        // set initial results to first page of data
+        this.results = this.executeSearch();
+        this.debouncedSearch = query =>
+            debounce(() => {
+                this.searh.execute(query);
+            }, 200);
+    },
+    mounted() {},
     methods: {
-        previousPage() {},
-        nextPage() {},
-        removeAccents(str) {
-            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        },
-        sortRankedItems() {},
-        getAcronym() {},
         startWorker() {
             this.worker = new Worker();
             this.worker.onmessage = e => this.workerListener(e);
-            this.configureWorker();
         },
-        configureWorker() {
-            this.worker.postMessage(
-                JSON.stringify({ type: 'CONFIG', payload: { paged: true } })
-            );
-        },
-        sendData() {
-            this.worker.postMessage(
-                JSON.stringify({ type: 'DATA', payload: this.data })
-            );
-        },
-        sendQuery() {
-            this.worker.postMessage(
-                JSON.stringify({ type: 'SEARCH', payload: this.query })
-            );
-        },
-        workerListener(e) {
-            const msg = JSON.parse(e.data);
-            console.log(msg);
-            this.results = msg.payload;
-            console.log(this.results);
-        },
+        // workerMessenger(type, payload) {
+        //     this.worker.postMessage(JSON.stringify({ type, payload }));
+        // },
+        // workerListener(e) {
+        //     const msg = JSON.parse(e.data);
+        //     this.results = msg.payload;
+        // },
     },
 };
