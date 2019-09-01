@@ -14,17 +14,17 @@ export default {
             required: false,
             default: () => [],
         },
+        keys: {
+            type: Array,
+            required: false,
+            default: () => [],
+        },
         query: {
             type: String,
             required: false,
             validator(val) {
                 return typeof val === 'string' || !val;
             },
-        },
-        keys: {
-            type: Array,
-            required: false,
-            default: () => [],
         },
         // TODO: test & fallback
         useWorker: {
@@ -77,15 +77,17 @@ export default {
     },
     watch: {
         data() {},
-        query() {},
+        query(newQuery) {
+            this.debouncedSearch(newQuery);
+        },
     },
     created() {
-        this.search = new Search(this.data, this.searchOptions);
+        this.search = new Search(this.data, this.keys, this.searchOptions);
         // set initial results to first page of data
         this.results = this.executeSearch();
         this.debouncedSearch = query =>
             debounce(() => {
-                this.searh.execute(query);
+                this.results = this.search.execute(query);
             }, 200);
     },
     mounted() {},

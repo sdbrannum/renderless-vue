@@ -13,8 +13,9 @@ const rankings = {
 };
 
 export default class Search {
-    constructor(data = [], options = {}) {
+    constructor(data = [], keys = [], options = {}) {
         this.data = data;
+        this.keys = keys;
         this.paged = options.paged || false;
         this.page = options.page || 1;
         this.pageSize = options.pageSize || data.length;
@@ -34,90 +35,31 @@ export default class Search {
             return this.data;
         }
 
-        const results = [];
-        const QUERY = query;
-        const QUERY_UPPER = query.toUpperCase();
+        const results = [],
+            hasKeys = this.keys.length > 0;
 
         for (let i = 0; i < this.data.length; i++) {
-            if (results.length > 2500) break;
             const el = this.data[i];
-            let beginPosition = 0;
-            // case sensitive equals
-            if (el === QUERY) {
-                results.push({
-                    rank: rankings.CASE_SENSITIVE_EQUAL,
-                    rankedItem: el,
-                });
-                continue;
+            const valsForItem = this.flatten(el, this.keys);
+            let rankResult = null;
+
+            if (hasKeys) {
+                // get highest rank for vals
+                rankResult = valsForItem.reduce((acc, curr) => {
+                    const ranked = this.rankItem(curr, query);
+                    if (!acc.rank || ranked.rank > acc.rank) {
+                        acc = ranked;
+                    }
+                    return acc;
+                }, {});
+                // TODO: add the total object to a property so we can return it as a result
+                // but it's necessary to keep the string here as the rankedItem so we can alphabetically sort
+            } else {
+                rankResult = this.rankItem(el, query);
             }
 
-            // upper casing before further comparison
-            const EL_UPPER = el.toUpperCase();
-
-            // case insensitive equals
-            if (EL_UPPER === QUERY_UPPER) {
-                results.push({
-                    rank: rankings.EQUAL,
-                    rankedItem: el,
-                    positions: [...this.range(beginPosition, query.length)],
-                });
-                continue;
-            }
-
-            // starts with
-            beginPosition = EL_UPPER.indexOf(QUERY_UPPER);
-            if (beginPosition === 0) {
-                results.push({
-                    rank: rankings.STARTS_WITH,
-                    rankedItem: el,
-                    positions: [...this.range(beginPosition, query.length)],
-                });
-                continue;
-            }
-
-            // any word except first starts with
-            beginPosition = EL_UPPER.indexOf(` ${QUERY_UPPER}`);
-            if (beginPosition !== -1) {
-                results.push({
-                    rank: rankings.WORD_STARTS_WITH,
-                    rankedItem: el,
-                    positions: [...this.range(beginPosition, query.length)],
-                });
-                continue;
-            }
-
-            // contains
-            beginPosition = EL_UPPER.indexOf(QUERY_UPPER);
-            if (beginPosition !== -1) {
-                results.push({
-                    rank: rankings.CONTAINS,
-                    rankedItem: el,
-                    positions: [...this.range(beginPosition, query.length)],
-                });
-                continue;
-            }
-
-            // in order subsequence
-            let minWin = this.minWinSeq(QUERY_UPPER, EL_UPPER);
-            if (minWin.minSequence && minWin.minSequence.length > 0) {
-                results.push({
-                    rank: rankings.SUBSEQUENCE,
-                    rankedItem: el,
-                    distance: minWin.minSequence.length - query.length,
-                    positions: minWin.positions,
-                });
-                continue;
-            }
-
-            minWin = this.minWinSub(QUERY_UPPER, EL_UPPER);
-            if (minWin.minSequence && minWin.minSequence.length > 0) {
-                results.push({
-                    rank: rankings.SUBSTRING,
-                    rankedItem: el,
-                    distance: minWin.minSequence.length - query.length,
-                    positions: minWin.positions,
-                });
-                continue;
+            if (rankResult && rankResult.rank >= this.threshold) {
+                results.push(rankResult);
             }
         }
 
@@ -135,6 +77,91 @@ export default class Search {
 
         const totalResults = results.length;
         return { results, totalResults };
+    }
+
+    rankItem(el, query) {
+        let beginPosition = 0;
+
+        // case sensitive equals
+        if (el === query) {
+            return {
+                rank: rankings.CASE_SENSITIVE_EQUAL,
+                rankedItem: el,
+                positions: [...this.range(beginPosition, query.left)],
+            };
+        }
+
+        // upper casing before further comparison
+        const EL_UPPER = el.toUpperCase(),
+            QUERY_UPPER = query.toUpperCase();
+
+        // case insensitive equals
+        if (EL_UPPER === QUERY_UPPER) {
+            return {
+                rank: rankings.EQUAL,
+                rankedItem: el,
+                positions: [...this.range(beginPosition, query.length)],
+            };
+        }
+
+        // starts with
+        beginPosition = EL_UPPER.indexOf(QUERY_UPPER);
+        if (beginPosition === 0) {
+            return {
+                rank: rankings.STARTS_WITH,
+                rankedItem: el,
+                positions: [...this.range(beginPosition, query.length)],
+            };
+        }
+
+        // any word except first starts with
+        beginPosition = EL_UPPER.indexOf(` ${QUERY_UPPER}`);
+        if (beginPosition !== -1) {
+            return {
+                rank: rankings.WORD_STARTS_WITH,
+                rankedItem: el,
+                positions: [...this.range(beginPosition, query.length)],
+            };
+        }
+
+        // contains
+        beginPosition = EL_UPPER.indexOf(QUERY_UPPER);
+        if (beginPosition !== -1) {
+            return {
+                rank: rankings.CONTAINS,
+                rankedItem: el,
+                positions: [...this.range(beginPosition, query.length)],
+            };
+        }
+
+        // in order subsequence
+        let minWin = this.minWinSeq(QUERY_UPPER, EL_UPPER);
+        if (minWin.minSequence && minWin.minSequence.length > 0) {
+            return {
+                rank: rankings.SUBSEQUENCE,
+                rankedItem: el,
+                distance: minWin.minSequence.length - query.length,
+                positions: minWin.positions,
+            };
+        }
+
+        minWin = this.minWinSub(QUERY_UPPER, EL_UPPER);
+        if (minWin.minSequence && minWin.minSequence.length > 0) {
+            return {
+                rank: rankings.SUBSTRING,
+                rankedItem: el,
+                distance: minWin.minSequence.length - query.length,
+                positions: minWin.positions,
+            };
+        }
+
+        // didn't meet search criteria
+        return {
+            rank: rankings.NO_MATCH,
+            rankedItem: el,
+            distance: -1,
+            position: [],
+        };
     }
 
     /**
@@ -293,6 +320,15 @@ export default class Search {
      */
     removeDiacritics(str) {
         return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    /**
+     * Gets values from object by keys and returns values in an array
+     * @param {Object} item
+     * @param {Array} keys
+     */
+    flatten(item, keys) {
+        return keys.map(key => item[key]);
     }
 
     /*

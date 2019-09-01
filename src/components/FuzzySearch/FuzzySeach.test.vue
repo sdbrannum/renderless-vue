@@ -1,40 +1,9 @@
 <template>
-    <FuzzySearch :data="questions" :query="search">
+    <FuzzySearch :data="questions" :keys="questionKeys" :query="search">
         <template v-slot="{ results }">
             <div>
                 <input v-model="search" />
                 Results: {{ results.length }}
-                <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
-                        <defs>
-                            <filter id="goo">
-                                <feGaussianBlur
-                                    in="SourceGraphic"
-                                    stdDeviation="10"
-                                    result="blur"
-                                />
-                                <feColorMatrix
-                                    in="blur"
-                                    mode="matrix"
-                                    values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 35 -10"
-                                    result="goo"
-                                />
-                                <feBlend
-                                    in="SourceGraphic"
-                                    in2="goo"
-                                    operator="atop"
-                                />
-                            </filter>
-                        </defs>
-                    </svg>
-                    <div class="loader">
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                    </div>
-                </div>
             </div>
         </template>
     </FuzzySearch>
@@ -50,6 +19,7 @@ export default {
     data() {
         return {
             questions: [],
+            questionKeys: [],
             search: null,
         };
     },
@@ -61,6 +31,7 @@ export default {
             try {
                 const res = await fetch('/jeopardy.json');
                 this.questions = await res.json();
+                this.questionKeys = ['question', 'answer'];
             } catch (e) {
                 console.error('error >', e);
             }
