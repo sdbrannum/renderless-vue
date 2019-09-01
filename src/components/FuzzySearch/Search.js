@@ -1,16 +1,4 @@
-const rankings = {
-    CASE_SENSITIVE_EQUAL: 10,
-    EQUAL: 9,
-    STARTS_WITH: 8,
-    WORD_STARTS_WITH: 7,
-    STRING_CASE: 6,
-    STRING_CASE_ACRONYM: 5,
-    CONTAINS: 4,
-    ACRONYM: 3,
-    SUBSEQUENCE: 2,
-    SUBSTRING: 1,
-    NO_MATCH: 0,
-};
+import rankings from './Rankings';
 
 export default class Search {
     constructor(data = [], keys = [], options = {}) {
@@ -28,13 +16,6 @@ export default class Search {
      * @remarks by reference
      */
     execute(query) {
-        if (!query) {
-            if (this.paged) {
-                return this.data.slice(0, this.pageSize);
-            }
-            return this.data;
-        }
-
         const results = [],
             hasKeys = this.keys.length > 0;
 
@@ -52,11 +33,12 @@ export default class Search {
                     }
                     return acc;
                 }, {});
-                // TODO: add the total object to a property so we can return it as a result
-                // but it's necessary to keep the string here as the rankedItem so we can alphabetically sort
             } else {
                 rankResult = this.rankItem(el, query);
             }
+
+            // add the item back to the result, necessary so when an object is used the full object is returned
+            rankResult.data = el;
 
             if (rankResult && rankResult.rank >= this.threshold) {
                 results.push(rankResult);
@@ -87,7 +69,9 @@ export default class Search {
             return {
                 rank: rankings.CASE_SENSITIVE_EQUAL,
                 rankedItem: el,
-                positions: [...this.range(beginPosition, query.left)],
+                positions: [
+                    ...this.range(beginPosition, beginPosition + query.length),
+                ],
             };
         }
 
@@ -100,7 +84,9 @@ export default class Search {
             return {
                 rank: rankings.EQUAL,
                 rankedItem: el,
-                positions: [...this.range(beginPosition, query.length)],
+                positions: [
+                    ...this.range(beginPosition, beginPosition + query.length),
+                ],
             };
         }
 
@@ -110,7 +96,9 @@ export default class Search {
             return {
                 rank: rankings.STARTS_WITH,
                 rankedItem: el,
-                positions: [...this.range(beginPosition, query.length)],
+                positions: [
+                    ...this.range(beginPosition, beginPosition + query.length),
+                ],
             };
         }
 
@@ -120,7 +108,9 @@ export default class Search {
             return {
                 rank: rankings.WORD_STARTS_WITH,
                 rankedItem: el,
-                positions: [...this.range(beginPosition, query.length)],
+                positions: [
+                    ...this.range(beginPosition, beginPosition + query.length),
+                ],
             };
         }
 
@@ -130,7 +120,9 @@ export default class Search {
             return {
                 rank: rankings.CONTAINS,
                 rankedItem: el,
-                positions: [...this.range(beginPosition, query.length)],
+                positions: [
+                    ...this.range(beginPosition, beginPosition + query.length),
+                ],
             };
         }
 

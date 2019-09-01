@@ -1,16 +1,16 @@
 <template>
     <div id="app">
-        <FuzzyTest />
+        <FuzzySearchImpl />
     </div>
 </template>
 
 <script>
-import FuzzyTest from '@/components/FuzzySearch/FuzzySearch.test.vue';
+import FuzzySearchImpl from '@/components/FuzzySearch/FuzzySearchImpl.vue';
 
 export default {
     name: 'app',
     components: {
-        FuzzyTest,
+        FuzzySearchImpl,
     },
 };
 </script>

@@ -6,6 +6,7 @@ export default {
     render() {
         return this.$scopedSlots.default({
             results: this.results,
+            totalResults: this.totalResults,
         });
     },
     props: {
@@ -56,13 +57,14 @@ export default {
         threshold: {
             type: [String, Number],
             required: false,
-            default: 'LCS',
+            default: 1,
         },
     },
     data() {
         return {
             worker: null,
             results: [],
+            totalResults: this.data.length,
         };
     },
     computed: {
@@ -76,19 +78,33 @@ export default {
         },
     },
     watch: {
-        data() {},
+        data(newData) {
+            this.search.data = newData;
+        },
+        keys(newKeys) {
+            this.search.keys = newKeys;
+        },
+        page(newPage) {
+            this.search.page = newPage;
+        },
         query(newQuery) {
+            console.log('new query', newQuery);
             this.debouncedSearch(newQuery);
         },
     },
     created() {
         this.search = new Search(this.data, this.keys, this.searchOptions);
         // set initial results to first page of data
-        this.results = this.executeSearch();
-        this.debouncedSearch = query =>
-            debounce(() => {
-                this.results = this.search.execute(query);
-            }, 200);
+        this.results = [
+            { data: { question: 'test', answer: 'foo' } },
+            { data: { question: 'foo', answer: 'test' } },
+        ];
+        const _self = this;
+        this.debouncedSearch = debounce(query => {
+            const searchResults = _self.search.execute(query);
+            this.results = searchResults.results;
+            this.totalResults = searchResults.totalResults;
+        }, 200);
     },
     mounted() {},
     methods: {
