@@ -5,6 +5,7 @@
             :keys="questionKeys"
             :query="searchQuestions"
             key="1"
+            :useWorker="true"
         >
             <template v-slot="{ results, totalResults }">
                 <div>
@@ -54,9 +55,9 @@ export default {
         return {
             questions: [],
             questionKeys: [],
-            searchQuestions: null,
+            searchQuestions: '',
             todos: [],
-            searchTodos: null,
+            searchTodos: '',
         };
     },
     mounted() {
@@ -67,7 +68,7 @@ export default {
             try {
                 const resTodos = await fetch('/todos.json');
                 this.todos = await resTodos.json();
-                const resQuestions = await fetch('/jeopardy_sm.json');
+                const resQuestions = await fetch('/jeopardy.json');
                 this.questions = await resQuestions.json();
                 this.questionKeys = ['question', 'answer'];
             } catch (e) {

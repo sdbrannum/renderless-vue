@@ -12,4 +12,12 @@ const rankings = {
     NO_MATCH: 0,
 };
 
-export default rankings;
+const msg_type = {
+    CONFIG: 'CONFIG',
+    DATA: 'DATA',
+    KEYS: 'KEYS',
+    SEARCH: 'SEARCH',
+    RESULTS: 'RESULTS',
+};
+
+export { rankings, msg_type };

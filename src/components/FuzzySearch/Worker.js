@@ -1,19 +1,12 @@
 import Search from './Search';
 
-const MSG_TYPES = {
-    config: 'CONFIG',
-    data: 'DATA',
-    search: 'SEARCH',
-};
+import { msg_type } from './Constants';
 
 class Comms {
-    constructor(options) {
+    constructor() {
         this.search = new Search();
-        console.log('search >>', this.search);
         this.data = [];
         this.results = [];
-        if (options && options.paged) this.paged = options.paged;
-        this.page = 1;
     }
 
     sendMessage(type, payload) {
@@ -21,22 +14,23 @@ class Comms {
     }
 
     handleMessage(e) {
-        console.log('handling message');
         const msg = JSON.parse(e.data);
-
+        console.log('received msg', msg);
         switch (msg.type.toString()) {
-            case MSG_TYPES.config:
-                this.paged = msg.payload.paged;
+            case msg_type.CONFIG:
+                this.search.paged = msg.payload.paged;
+                this.search.pageSize = msg.payload.pageSize;
+                this.search.threshold = msg.payload.threshold;
                 break;
-            case MSG_TYPES.data:
-                console.log('hit data case');
-                this.data = msg.payload;
+            case msg_type.DATA:
+                this.search.data = msg.payload;
                 break;
-            case MSG_TYPES.search:
-                console.log('hit search case', this.search);
-                console.log(msg.payload);
-                console.log(this.data.length);
-                this.results = this.search.execute(msg.payload, this.data);
+            case msg_type.KEYS:
+                this.search.keys = msg.payload;
+                break;
+            case msg_type.SEARCH:
+                console.log('in worker, searching');
+                this.results = this.search.execute(msg.payload);
                 console.log(this.results);
                 if (this.paged) {
                     const pageRangeLower = this.paged ? this.page * 5 - 5 : 0;
@@ -49,6 +43,7 @@ class Comms {
                 }
                 break;
             default:
+                console.log('in default', msg.type.toString());
                 break;
         }
     }

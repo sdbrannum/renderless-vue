@@ -1,4 +1,4 @@
-import rankings from './Rankings';
+import { rankings } from './Constants';
 
 export default class Search {
     constructor(data = [], keys = [], options = {}) {
@@ -16,6 +16,9 @@ export default class Search {
      * @remarks by reference
      */
     execute(query) {
+        if (query === null) {
+            query = '';
+        }
         const results = [],
             hasKeys = this.keys.length > 0;
 
