@@ -9,6 +9,10 @@ class Comms {
         this.results = [];
     }
 
+    sendResults() {
+        this.sendMessage('RESULTS', this.results);
+    }
+
     sendMessage(type, payload) {
         postMessage(JSON.stringify({ type, payload }));
     }
@@ -22,6 +26,10 @@ class Comms {
                 this.search.pageSize = msg.payload.pageSize;
                 this.search.threshold = msg.payload.threshold;
                 break;
+            case msg_type.PAGE:
+                this.results = this.search.getPage(msg.payload);
+                this.sendResults();
+                break;
             case msg_type.DATA:
                 this.search.data = msg.payload;
                 break;
@@ -29,18 +37,8 @@ class Comms {
                 this.search.keys = msg.payload;
                 break;
             case msg_type.SEARCH:
-                console.log('in worker, searching');
                 this.results = this.search.execute(msg.payload);
-                console.log(this.results);
-                if (this.paged) {
-                    const pageRangeLower = this.paged ? this.page * 5 - 5 : 0;
-                    this.sendMessage(
-                        'RESULTS',
-                        this.results.slice(pageRangeLower, 5)
-                    );
-                } else {
-                    this.sendMessage('RESULTS', this.results);
-                }
+                this.sendResults();
                 break;
             default:
                 console.log('in default', msg.type.toString());

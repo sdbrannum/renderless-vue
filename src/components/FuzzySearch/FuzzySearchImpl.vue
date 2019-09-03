@@ -3,14 +3,19 @@
         <FuzzySearch
             :data="questions"
             :keys="questionKeys"
-            :query="searchQuestions"
-            key="1"
+            :query="questionsSearch"
+            :paged="true"
+            :page="questionsPage"
             :useWorker="true"
+            key="1"
         >
-            <template v-slot="{ results, totalResults }">
+            <template v-slot="{ results, totalResults, isSearching }">
                 <div>
-                    <input v-model="searchQuestions" />
-                    Results: {{ totalResults }}
+                    <input v-model="questionsSearch" />
+                    Is searching: {{ isSearching }} Results: {{ totalResults }}
+                    <button type="button" @click="questionsPage += 1">
+                        Next Page
+                    </button>
                     <table>
                         <thead>
                             <th>Question</th>
@@ -55,7 +60,8 @@ export default {
         return {
             questions: [],
             questionKeys: [],
-            searchQuestions: '',
+            questionsSearch: '',
+            questionsPage: 1,
             todos: [],
             searchTodos: '',
         };

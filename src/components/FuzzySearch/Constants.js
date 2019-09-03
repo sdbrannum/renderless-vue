@@ -14,6 +14,7 @@ const rankings = {
 
 const msg_type = {
     CONFIG: 'CONFIG',
+    PAGE: 'PAGE',
     DATA: 'DATA',
     KEYS: 'KEYS',
     SEARCH: 'SEARCH',

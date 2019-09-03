@@ -5,9 +5,10 @@ export default class Search {
         this.data = data;
         this.keys = keys;
         this.paged = options.paged || false;
-        this.page = options.page || 1;
         this.pageSize = options.pageSize || data.length;
         this.threshold = options.threshold || rankings.SUBSTRING;
+        this.results = [];
+        this.cachedQuery = null;
     }
     /**
      * Return sorted and matched results based on given query and data
@@ -16,11 +17,28 @@ export default class Search {
      * @remarks by reference
      */
     execute(query) {
-        if (query === null) {
-            query = '';
+        this.cachedQuery = query;
+        this.results = [];
+        if (!query) {
+            for (let i = 0; i < this.data.length; i++) {
+                this.results.push({
+                    rank: -1,
+                    rankedItem: null,
+                    positions: [],
+                    data: this.data[i],
+                });
+            }
+            if (this.paged) {
+                return this.getPage(1);
+            }
+
+            return {
+                results: this.results,
+                totalResults: this.data.length,
+            };
         }
-        const results = [],
-            hasKeys = this.keys.length > 0;
+
+        const hasKeys = this.keys.length > 0;
 
         for (let i = 0; i < this.data.length; i++) {
             const el = this.data[i];
@@ -44,7 +62,7 @@ export default class Search {
             rankResult.data = el;
 
             if (rankResult && rankResult.rank >= this.threshold) {
-                results.push(rankResult);
+                this.results.push(rankResult);
             }
         }
 
@@ -58,10 +76,14 @@ export default class Search {
             return b.rank - a.rank;
         };
 
-        results.sort(sortRankedItems);
+        this.results.sort(sortRankedItems);
 
-        const totalResults = results.length;
-        return { results, totalResults };
+        if (this.paged) {
+            return this.getPage(1);
+        }
+
+        const totalResults = this.results.length;
+        return { results: this.results, totalResults };
     }
 
     rankItem(el, query) {
@@ -333,5 +355,16 @@ export default class Search {
         return Array(Math.ceil((stop - start) / 1))
             .fill(start)
             .map((x, y) => x + y * 1);
+    }
+
+    getPage(page) {
+        const startIndex = this.pageSize * (page - 1);
+        const endIndex = this.pageSize * page;
+        const pagedResults = this.results.slice(startIndex, endIndex);
+        const totalResults = this.results.length;
+        return {
+            results: pagedResults,
+            totalResults,
+        };
     }
 }

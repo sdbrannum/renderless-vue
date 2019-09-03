@@ -8,6 +8,7 @@ export default {
         return this.$scopedSlots.default({
             results: this.results,
             totalResults: this.totalResults,
+            isSearching: this.isSearching,
         });
     },
     props: {
@@ -66,13 +67,13 @@ export default {
             worker: null,
             results: [],
             totalResults: this.data.length,
+            isSearching: false,
         };
     },
     computed: {
         searchOptions() {
             return {
                 paged: this.paged,
-                page: this.page,
                 pageSize: this.pageSize,
                 threshold: this.threshold,
             };
@@ -94,7 +95,11 @@ export default {
             }
         },
         page(newPage) {
-            this.search.page = newPage;
+            if (this.worker) {
+                this.workerMessenger(msg_type.PAGE, newPage);
+            } else {
+                this.search.getPage(newPage);
+            }
         },
         query(newQuery) {
             console.log('new query', newQuery);
@@ -108,12 +113,15 @@ export default {
             this.worker.onmessage = e => this.workerListener(e);
             this.workerMessenger(msg_type.CONFIG, this.searchOptions);
             this.debouncedSearch = debounce(query => {
+                this.isSearching = true;
                 this.workerMessenger(msg_type.SEARCH, query);
             }, 200);
         } else {
             this.search = new Search(this.data, this.keys, this.searchOptions);
             this.debouncedSearch = debounce(query => {
+                this.isSearching = true;
                 const searchResults = this.search.execute(query);
+                this.isSearching = false;
                 this.results = searchResults.results;
                 this.totalResults = searchResults.totalResults;
             }, 200);
@@ -126,6 +134,7 @@ export default {
             this.worker.postMessage(JSON.stringify({ type, payload }));
         },
         workerListener(e) {
+            this.isSearching = false;
             const msg = JSON.parse(e.data);
             console.log('workerListener', msg);
             this.results = msg.payload.results;
