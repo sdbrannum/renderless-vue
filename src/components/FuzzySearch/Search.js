@@ -51,6 +51,13 @@ export default class Search {
                     const ranked = this.rankItem(curr, query);
                     if (!acc.rank || ranked.rank > acc.rank) {
                         acc = ranked;
+                    } else if (acc.rank == ranked.rank) {
+                        const alphabetCompare = ranked.rankedItem.localeCompare(
+                            acc.rankedItem
+                        );
+                        if (alphabetCompare < 0) {
+                            acc = ranked;
+                        }
                     }
                     return acc;
                 }, {});
