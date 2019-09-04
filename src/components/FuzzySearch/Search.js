@@ -69,7 +69,11 @@ export default class Search {
             // add the item back to the result, necessary so when an object is used the full object is returned
             rankResult.data = el;
 
-            if (rankResult && rankResult.rank >= this.threshold) {
+            if (
+                rankResult &&
+                rankResult.rank >= this.threshold &&
+                rankResult.distance <= this.maxDistance
+            ) {
                 this.results.push(rankResult);
             }
         }
@@ -102,6 +106,7 @@ export default class Search {
             return {
                 rank: rankings.CASE_SENSITIVE_EQUAL,
                 rankedItem: el,
+                distance: 0,
                 positions: [
                     ...this.range(beginPosition, beginPosition + query.length),
                 ],
@@ -117,6 +122,7 @@ export default class Search {
             return {
                 rank: rankings.EQUAL,
                 rankedItem: el,
+                distance: 0,
                 positions: [
                     ...this.range(beginPosition, beginPosition + query.length),
                 ],
@@ -129,6 +135,7 @@ export default class Search {
             return {
                 rank: rankings.STARTS_WITH,
                 rankedItem: el,
+                distance: 0,
                 positions: [
                     ...this.range(beginPosition, beginPosition + query.length),
                 ],
@@ -141,6 +148,7 @@ export default class Search {
             return {
                 rank: rankings.WORD_STARTS_WITH,
                 rankedItem: el,
+                distance: 0,
                 positions: [
                     ...this.range(beginPosition, beginPosition + query.length),
                 ],
@@ -153,6 +161,7 @@ export default class Search {
             return {
                 rank: rankings.CONTAINS,
                 rankedItem: el,
+                distance: 0,
                 positions: [
                     ...this.range(beginPosition, beginPosition + query.length),
                 ],
@@ -162,28 +171,22 @@ export default class Search {
         // in order subsequence
         let minWin = this.minWinSeq(QUERY_UPPER, EL_UPPER);
         if (minWin.minSequence && minWin.minSequence.length > 0) {
-            const distance = minWin.searchString.left - query.length;
-            if (distance <= this.maxDistance) {
-                return {
-                    rank: rankings.SUBSEQUENCE,
-                    rankedItem: el,
-                    distance: distance,
-                    positions: minWin.positions,
-                };
-            }
+            return {
+                rank: rankings.SUBSEQUENCE,
+                rankedItem: el,
+                distance: minWin.searchString.left - query.length,
+                positions: minWin.positions,
+            };
         }
 
         minWin = this.minWinSub(QUERY_UPPER, EL_UPPER);
         if (minWin.minSequence && minWin.minSequence.length > 0) {
-            const distance = minWin.minSequence.length - query.length;
-            if (distance <= this.maxDistance) {
-                return {
-                    rank: rankings.SUBSTRING,
-                    rankedItem: el,
-                    distance: distance,
-                    positions: minWin.positions,
-                };
-            }
+            return {
+                rank: rankings.SUBSTRING,
+                rankedItem: el,
+                distance: minWin.minSequence.length - query.length,
+                positions: minWin.positions,
+            };
         }
 
         // didn't meet search criteria
