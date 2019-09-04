@@ -7,6 +7,7 @@ export default class Search {
         this.paged = options.paged || false;
         this.pageSize = options.pageSize || data.length;
         this.threshold = options.threshold || rankings.SUBSTRING;
+        this.maxDistance = options.maxDistance || 9;
         this.results = [];
         this.cachedQuery = null;
     }
@@ -161,22 +162,28 @@ export default class Search {
         // in order subsequence
         let minWin = this.minWinSeq(QUERY_UPPER, EL_UPPER);
         if (minWin.minSequence && minWin.minSequence.length > 0) {
-            return {
-                rank: rankings.SUBSEQUENCE,
-                rankedItem: el,
-                distance: minWin.minSequence.length - query.length,
-                positions: minWin.positions,
-            };
+            const distance = minWin.searchString.left - query.length;
+            if (distance <= this.maxDistance) {
+                return {
+                    rank: rankings.SUBSEQUENCE,
+                    rankedItem: el,
+                    distance: distance,
+                    positions: minWin.positions,
+                };
+            }
         }
 
         minWin = this.minWinSub(QUERY_UPPER, EL_UPPER);
         if (minWin.minSequence && minWin.minSequence.length > 0) {
-            return {
-                rank: rankings.SUBSTRING,
-                rankedItem: el,
-                distance: minWin.minSequence.length - query.length,
-                positions: minWin.positions,
-            };
+            const distance = minWin.minSequence.length - query.length;
+            if (distance <= this.maxDistance) {
+                return {
+                    rank: rankings.SUBSTRING,
+                    rankedItem: el,
+                    distance: distance,
+                    positions: minWin.positions,
+                };
+            }
         }
 
         // didn't meet search criteria

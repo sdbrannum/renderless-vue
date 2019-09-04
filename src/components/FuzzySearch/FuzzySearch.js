@@ -61,6 +61,11 @@ export default {
             required: false,
             default: 2,
         },
+        maxDistance: {
+            type: Number,
+            required: false,
+            default: 9,
+        },
     },
     data() {
         return {
@@ -76,6 +81,7 @@ export default {
                 paged: this.paged,
                 pageSize: this.pageSize,
                 threshold: this.threshold,
+                maxDistance: this.maxDistance,
             };
         },
     },
