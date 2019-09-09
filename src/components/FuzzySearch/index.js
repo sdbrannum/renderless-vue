@@ -1,7 +1,7 @@
-import Search from './Search';
-import Worker from 'worker-loader!./Worker';
+import Search from './search';
+import Worker from 'worker-loader!./search.worker.js';
 import debounce from 'lodash.debounce';
-import { msg_type } from './Constants';
+import { msg_type } from './constants';
 
 export default {
     render() {
@@ -59,7 +59,7 @@ export default {
         threshold: {
             type: [String, Number],
             required: false,
-            default: 0,
+            default: 1,
         },
         maxDistance: {
             type: Number,
@@ -108,12 +108,10 @@ export default {
             }
         },
         query(newQuery) {
-            console.log('new query', newQuery);
             this.debouncedSearch(newQuery);
         },
     },
     created() {
-        console.log('hel', this.useWorker && !!window.Worker);
         if (this.useWorker && !!window.Worker) {
             this.worker = new Worker();
             this.worker.onmessage = e => this.workerListener(e);
@@ -136,13 +134,11 @@ export default {
     mounted() {},
     methods: {
         workerMessenger(type, payload) {
-            console.log('sending msg', type, payload);
             this.worker.postMessage(JSON.stringify({ type, payload }));
         },
         workerListener(e) {
             this.isSearching = false;
             const msg = JSON.parse(e.data);
-            console.log('workerListener', msg);
             this.results = msg.payload.results;
             this.totalResults = msg.payload.totalResults;
         },

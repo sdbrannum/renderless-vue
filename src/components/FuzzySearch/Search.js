@@ -1,4 +1,4 @@
-import { rankings } from './Constants';
+import { rankings } from './constants';
 
 export default class Search {
     constructor(data = [], keys = [], options = {}) {
@@ -6,7 +6,7 @@ export default class Search {
         this.keys = keys;
         this.paged = options.paged || false;
         this.pageSize = options.pageSize || data.length;
-        this.threshold = options.threshold || rankings.NO_MATCH;
+        this.threshold = options.threshold || rankings.SUBSTRING;
         this.maxDistance = options.maxDistance || 9;
         this.results = [];
         this.cachedQuery = null;
@@ -64,6 +64,7 @@ export default class Search {
                 }, {});
             } else {
                 rankResult = this.rankItem(el, query);
+                console.log(rankResult);
             }
 
             // add the item back to the result, necessary so when an object is used the full object is returned
@@ -174,7 +175,7 @@ export default class Search {
             return {
                 rank: rankings.SUBSEQUENCE,
                 rankedItem: el,
-                distance: minWin.minSequence.left - query.length,
+                distance: minWin.minSequence.length - query.length,
                 positions: minWin.positions,
             };
         }

@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import FuzzySearch from './FuzzySearch.js';
+import FuzzySearch from './index.js';
 
 export default {
     components: {

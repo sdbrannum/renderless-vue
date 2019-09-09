@@ -1,6 +1,6 @@
-import Search from './Search';
+import Search from './search';
 
-import { msg_type } from './Constants';
+import { msg_type } from './constants';
 
 class Comms {
     constructor() {
@@ -19,7 +19,6 @@ class Comms {
 
     handleMessage(e) {
         const msg = JSON.parse(e.data);
-        console.log('received msg', msg);
         switch (msg.type.toString()) {
             case msg_type.CONFIG:
                 this.search.paged = msg.payload.paged;
