@@ -21,7 +21,7 @@ Import component
 | paged       | Paginate the results                                                   | Boolean                   | false   |
 | pageSize    | If paged, the number of results to return                              | Number                    | 50      |
 | page        | The current page of results                                            | Number                    | 1       |
-| threshold   | The threshold at which an item must rank to be included in the results | Number ([see](#rankings)) | 2       |
+| threshold   | The threshold at which an item must rank to be included in the results | Number ([see](#rankings)) | 0       |
 | maxDistance | The max distance between characters to match on for subsequences       | Number                    | 9       |
 
 #### How search is performed
@@ -40,6 +40,7 @@ Below rankings are case-insensitive
 -   **Contains (3)** - The searchable string contains the query somewhere e.g. "xcus" matches “<mark>Excuse</mark> me. I believe you have my stapler.”
 -   **In-order subsequence (2)** - The searchable string contains the query in-order but may have letters in between the query letters e.g. "Ecse" matches "<mark>Excuse</mark> me. I believe you have my stapler.”
 -   **Out-of-order subsequence (1)** - The searchable string contains the query but the letters may be out-of-order and have other letters or spaces in between the query letters e.g. "eecuxs" matches “<mark>Excuse</mark> me. I believe you have my stapler.”
+-   **No Match (0)**
 
 #### When to use a dedicated web worker
 

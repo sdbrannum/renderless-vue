@@ -59,7 +59,7 @@ export default {
         threshold: {
             type: [String, Number],
             required: false,
-            default: 2,
+            default: 0,
         },
         maxDistance: {
             type: Number,

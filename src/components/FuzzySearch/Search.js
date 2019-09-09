@@ -6,7 +6,7 @@ export default class Search {
         this.keys = keys;
         this.paged = options.paged || false;
         this.pageSize = options.pageSize || data.length;
-        this.threshold = options.threshold || rankings.SUBSTRING;
+        this.threshold = options.threshold || rankings.NO_MATCH;
         this.maxDistance = options.maxDistance || 9;
         this.results = [];
         this.cachedQuery = null;
@@ -174,7 +174,7 @@ export default class Search {
             return {
                 rank: rankings.SUBSEQUENCE,
                 rankedItem: el,
-                distance: minWin.searchString.left - query.length,
+                distance: minWin.minSequence.left - query.length,
                 positions: minWin.positions,
             };
         }
