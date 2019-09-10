@@ -1,10 +1,17 @@
 <template>
-    <div id="app"></div>
+    <div id="app">
+        <FuzzySearchImpl />
+    </div>
 </template>
 
 <script>
+import FuzzySearchImpl from '@/components/FuzzySearch/FuzzySearchImpl.vue';
+
 export default {
     name: 'app',
+    components: {
+        FuzzySearchImpl,
+    },
 };
 </script>
 

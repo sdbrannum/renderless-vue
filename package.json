@@ -2,14 +2,27 @@
   "name": "render",
   "version": "0.0.0",
   "private": false,
+  "main": "dist/render.umd.js",
+  "module": "dist/render.esm.js",
+  "unpkg": "dist/render.min.js",
+  "browser": {
+    "./sfc": "src/FuzzySearch/index.js"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "package": "vue-cli-service build --target lib --name sdblib ./src/entry.js",
+    "package": "vue-cli-service build --target lib --name render ./src/entry.js",
     "lint": "vue-cli-service lint",
     "test:e2e": "vue-cli-service test:e2e",
-    "test:unit": "vue-cli-service test:unit"
+    "test:unit": "vue-cli-service test:unit",
+    "rbuild": "npm run rbuild:umd & npm run rbuild:es & npm run rbuild:unpkg",
+    "rbuild:umd": "rollup --config build/rollup.config.js --format umd --file dist/render.umd.js",
+    "rbuild:es": "rollup --config build/rollup.config.js --format es --file dist/render.esm.js",
+    "rbuild:unpkg": "rollup --config build/rollup.config.js --format iife --file dist/render.min.js"
   },
+  "files": [
+    "dist/*.js"
+  ],
   "dependencies": {
     "core-js": "^2.6.5",
     "vue": "^2.6.10"
@@ -30,7 +43,14 @@
     "eslint-plugin-vue": "^5.0.0",
     "lint-staged": "^8.1.5",
     "prettier": "^1.18.2",
-    "vue-template-compiler": "^2.6.10"
+    "rollup": "^1.21.0",
+    "rollup-plugin-buble": "^0.19.8",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-terser": "^5.1.1",
+    "rollup-plugin-vue": "^5.0.1",
+    "rollup-plugin-web-worker-loader": "^0.6.0",
+    "vue-template-compiler": "^2.6.10",
+    "worker-loader": "^2.0.0"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
