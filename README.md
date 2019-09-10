@@ -1,4 +1,4 @@
-# render
+# Render
 
 Render is a work in progress of potentially useful renderless Vue.js components. Renderless components, as the name suggests, have no UI definition. These components merely provide the logic and internal functionality for you to use. This allows for you to create the front-end look and feel, define accessiblity, and handle semantics without needing to code the logic behind the component.
 
@@ -49,51 +49,3 @@ A dedicated web worker is most useful when you have a large set of data that you
 [Here]() is a test of this feature that allows you to search through around 60,000 records while keeping the UI responsive.
 
 Internally, if the user's browser does not support web workers we fall back to searching on the UI thread.
-
-## Contributing
-
-## Project setup
-
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-
-```
-npm run build
-```
-
-### Run your tests
-
-```
-npm run test
-```
-
-### Lints and fixes files
-
-```
-npm run lint
-```
-
-### Run your end-to-end tests
-
-```
-npm run test:e2e
-```
-
-### Run your unit tests
-
-```
-npm run test:unit
-```
-
-### Customize configuration
-
-See [Configuration Reference](https://cli.vuejs.org/config/).
