@@ -14,11 +14,11 @@ class Comms {
     }
 
     sendMessage(type, payload) {
-        postMessage(JSON.stringify({ type, payload }));
+        postMessage({ type, payload });
     }
 
     handleMessage(e) {
-        const msg = JSON.parse(e.data);
+        const msg = e.data;
         switch (msg.type.toString()) {
             case msg_type.CONFIG:
                 this.search.paged = msg.payload.paged;

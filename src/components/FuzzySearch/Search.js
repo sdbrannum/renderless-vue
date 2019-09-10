@@ -64,7 +64,6 @@ export default class Search {
                 }, {});
             } else {
                 rankResult = this.rankItem(el, query);
-                console.log(rankResult);
             }
 
             // add the item back to the result, necessary so when an object is used the full object is returned

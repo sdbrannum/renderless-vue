@@ -1,23 +1,12 @@
-// {
-//     module: {
-//         rules: [
-//             {
-//                 test: /\.worker\.js$/,
-//                 use: { loader: 'worker-loader' }
-//             }
-//         ];
-//     }
-// }
+function getProdExternals() {
+    return {
+        vue: 'Vue',
+    };
+}
 
-// vue.config.js
-// module.exports = {
-//     chainWebpack: config => {
-//         // GraphQL Loader
-//         config.module
-//             .rule('webworker')
-//             .test(/\.worker\.js$/)
-//             .use('worker-loader')
-//             .loader('worker-loader')
-//             .end();
-//     }
-// };
+module.exports = {
+    configureWebpack: {
+        externals:
+            process.env.NODE_ENV === 'production' ? getProdExternals() : {},
+    },
+};

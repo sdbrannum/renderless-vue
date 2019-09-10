@@ -1,6 +1,6 @@
 import Search from './search';
-import Worker from 'worker-loader!./search.worker.js';
-import debounce from 'lodash.debounce';
+import Worker from 'worker-loader!./search.worker.js'; // use during dev
+// import Worker from 'web-worker:./search.worker.js'; // use for build
 import { msg_type } from './constants';
 
 export default {
@@ -8,7 +8,7 @@ export default {
         return this.$scopedSlots.default({
             results: this.results,
             totalResults: this.totalResults,
-            isSearching: this.isSearching,
+            searching: this.searching,
         });
     },
     props: {
@@ -29,7 +29,6 @@ export default {
                 return typeof val === 'string' || !val;
             },
         },
-        // TODO: test & fallback
         useWorker: {
             type: Boolean,
             required: false,
@@ -56,15 +55,29 @@ export default {
             required: false,
             default: 50,
         },
+        /**
+         * Minimum ranking
+         */
         threshold: {
             type: [String, Number],
             required: false,
             default: 1,
         },
+        /**
+         * Max dist between subsequences
+         */
         maxDistance: {
             type: Number,
             required: false,
             default: 9,
+        },
+        /**
+         * Debounce wait time
+         */
+        wait: {
+            type: Number,
+            required: false,
+            default: 200,
         },
     },
     data() {
@@ -72,7 +85,7 @@ export default {
             worker: null,
             results: [],
             totalResults: this.data.length,
-            isSearching: false,
+            searching: false,
         };
     },
     computed: {
@@ -112,35 +125,46 @@ export default {
         },
     },
     created() {
+        const debounce = (callback, time = 250, interval) => (...args) =>
+            clearTimeout(
+                interval,
+                (interval = setTimeout(callback, time, ...args))
+            );
+
         if (this.useWorker && !!window.Worker) {
             this.worker = new Worker();
             this.worker.onmessage = e => this.workerListener(e);
             this.workerMessenger(msg_type.CONFIG, this.searchOptions);
             this.debouncedSearch = debounce(query => {
-                this.isSearching = true;
+                this.setSearching(true);
                 this.workerMessenger(msg_type.SEARCH, query);
-            }, 200);
+            }, this.wait);
         } else {
             this.search = new Search(this.data, this.keys, this.searchOptions);
             this.debouncedSearch = debounce(query => {
-                this.isSearching = true;
-                const searchResults = this.search.execute(query);
-                this.isSearching = false;
-                this.results = searchResults.results;
-                this.totalResults = searchResults.totalResults;
-            }, 200);
+                this.setSearching(true);
+                ({
+                    results: this.results,
+                    totalResults: this.totalResults,
+                } = this.search.execute(query));
+                this.setSearching(false);
+            }, this.wait);
         }
     },
     mounted() {},
     methods: {
         workerMessenger(type, payload) {
-            this.worker.postMessage(JSON.stringify({ type, payload }));
+            this.worker.postMessage({ type, payload });
         },
         workerListener(e) {
-            this.isSearching = false;
-            const msg = JSON.parse(e.data);
+            this.setSearching(false);
+            const msg = e.data;
             this.results = msg.payload.results;
             this.totalResults = msg.payload.totalResults;
+        },
+        setSearching(isSearching) {
+            this.searching = isSearching;
+            this.$emit('searching', isSearching);
         },
     },
 };
