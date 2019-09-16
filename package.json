@@ -11,7 +11,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "package": "vue-cli-service build --target lib --name render ./src/entry.js",
+    "package": "node build/build.js",
     "lint": "vue-cli-service lint",
     "test:e2e": "vue-cli-service test:e2e",
     "test:unit": "vue-cli-service test:unit",

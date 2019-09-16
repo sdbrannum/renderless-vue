@@ -1,0 +1,22 @@
+{
+    "name": "render",
+    "description": "A renderless vue component library",
+    "author": {
+        "name": "Steven Brannum",
+        "email": "sdbrannum@gmail.com",
+        "github": "sdbrannum"
+    },
+    "peerDependencies": {
+        "vue": ">=2.0.0"
+    },
+    "packages": {
+        "render.r-calendar": {
+            "version": "0.0.0",
+            "description": "A renderless vue.js calendar component."
+        },
+        "render.r-search": {
+            "version": "0.0.0",
+            "description": "A renderless vue.js search component."
+        }
+    }
+}

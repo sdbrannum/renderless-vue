@@ -1,11 +1,11 @@
 // Import vue component
-import FuzzySearch from './index.js';
+import RSearch from './index.js';
 
 // Declare install function executed by Vue.use()
 export function install(Vue) {
     if (install.installed) return;
     install.installed = true;
-    Vue.component('FuzzySearch', FuzzySearch);
+    Vue.component('RSearch', RSearch);
 }
 
 // Create module definition for Vue.use()
@@ -25,4 +25,4 @@ if (GlobalVue) {
 }
 
 // To allow use as module (npm/webpack/etc.) export component
-export default FuzzySearch;
+export default RSearch;

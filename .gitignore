@@ -1,6 +1,8 @@
 .DS_Store
 node_modules
 /dist
+/packages
+/src/entry.js
 *.tgz
 
 /tests/e2e/videos/

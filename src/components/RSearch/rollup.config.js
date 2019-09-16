@@ -2,40 +2,29 @@ import commonjs from 'rollup-plugin-commonjs'; // Convert CommonJS modules to ES
 import vue from 'rollup-plugin-vue'; // Handle .vue SFC files
 import buble from 'rollup-plugin-buble'; // Transpile/polyfill with reasonable browser support
 import { terser } from 'rollup-plugin-terser';
-import resolve from 'rollup-plugin-node-resolve'; // resolve to include external dependencies
 import webWorkerLoader from 'rollup-plugin-web-worker-loader';
-// import bundleWorker from 'rollup-plugin-bundle-worker';
 
 export default {
-    input: 'src/entry.js',
+    input: 'src/components/RSearch/wrapper.js',
     output: [
         {
-            name: 'Render',
+            name: 'RSearch',
             exports: 'named',
-            file: 'packages/render/index.esm.js',
+            file: 'packages/render.r-search/index.esm.js',
             format: 'es',
         },
         {
-            name: 'Render',
+            name: 'RSearch',
             exports: 'named',
-            file: 'packages/render/index.umd.js',
+            file: 'packages/render.r-search/index.umd.js',
             format: 'umd',
         },
         {
-            name: 'Render',
+            name: 'RSearch',
             exports: 'named',
             format: 'iife',
-            file: 'packages/render/index.min.js',
+            file: 'packages/render.r-search/index.min.js',
         },
     ],
-    plugins: [
-        commonjs(),
-        vue(),
-        buble(),
-        terser(),
-        webWorkerLoader(),
-        resolve({
-            only: ['date-fns'],
-        }),
-    ],
+    plugins: [commonjs(), vue(), buble(), terser(), webWorkerLoader()],
 };

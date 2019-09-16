@@ -3,29 +3,27 @@ import vue from 'rollup-plugin-vue'; // Handle .vue SFC files
 import buble from 'rollup-plugin-buble'; // Transpile/polyfill with reasonable browser support
 import { terser } from 'rollup-plugin-terser';
 import resolve from 'rollup-plugin-node-resolve'; // resolve to include external dependencies
-import webWorkerLoader from 'rollup-plugin-web-worker-loader';
-// import bundleWorker from 'rollup-plugin-bundle-worker';
 
 export default {
-    input: 'src/entry.js',
+    input: 'src/components/RCalendar/wrapper.js',
     output: [
         {
-            name: 'Render',
+            name: 'RCalendar',
             exports: 'named',
-            file: 'packages/render/index.esm.js',
+            file: 'packages/render.r-calendar/index.esm.js',
             format: 'es',
         },
         {
-            name: 'Render',
+            name: 'RCalendar',
             exports: 'named',
-            file: 'packages/render/index.umd.js',
+            file: 'packages/render.r-calendar/index.umd.js',
             format: 'umd',
         },
         {
-            name: 'Render',
+            name: 'RCalendar',
             exports: 'named',
             format: 'iife',
-            file: 'packages/render/index.min.js',
+            file: 'packages/render.r-calendar/index.min.js',
         },
     ],
     plugins: [
@@ -33,7 +31,6 @@ export default {
         vue(),
         buble(),
         terser(),
-        webWorkerLoader(),
         resolve({
             only: ['date-fns'],
         }),

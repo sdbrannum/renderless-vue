@@ -1,6 +1,6 @@
 <template>
     <div>
-        <FuzzySearch
+        <RSearch
             :data="questions"
             :keys="questionKeys"
             :query="questionsSearch"
@@ -32,8 +32,8 @@
                     </table>
                 </div>
             </template>
-        </FuzzySearch>
-        <FuzzySearch :data="todos" :query="searchTodos" key="2">
+        </RSearch>
+        <RSearch :data="todos" :query="searchTodos" key="2">
             <template v-slot="{ results, totalResults }">
                 <div>
                     <input v-model="searchTodos" />
@@ -45,16 +45,16 @@
                     </ul>
                 </div>
             </template>
-        </FuzzySearch>
+        </RSearch>
     </div>
 </template>
 
 <script>
-import FuzzySearch from './index.js';
+import RSearch from './index.js';
 
 export default {
     components: {
-        FuzzySearch,
+        RSearch,
     },
     data() {
         return {
