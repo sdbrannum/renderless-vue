@@ -133,7 +133,7 @@ export default {
             } else {
                 this.search.data = newData;
                 if (this.prefill) {
-                    this.search.execute(null, this.page);
+                    this.onSearchResults(this.search.execute(null, this.page));
                 }
             }
         },
@@ -157,7 +157,7 @@ export default {
                     })
                     .then(payload => this.onSearchResults(payload));
             } else {
-                this.search.execute(this.query, newPage);
+                this.onSearchResults(this.search.execute(this.query, newPage));
             }
         },
         query(newQuery) {
@@ -201,7 +201,6 @@ export default {
             this.$emit('searching', isSearching);
         },
         onSearchResults(payload) {
-            console.log('hit', this.page, payload);
             this.setSearching(false);
             this.results = payload.results;
             this.totalResults = payload.totalResults;
