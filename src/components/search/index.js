@@ -105,6 +105,7 @@ export default {
     computed: {
         searchOptions() {
             return {
+                keys: this.keys,
                 paged: this.paged,
                 pageSize: this.pageSize,
                 threshold: this.threshold,
@@ -148,7 +149,6 @@ export default {
             }
         },
         page(newPage) {
-            // console.log('new page >>', newPage);
             if (this.worker) {
                 this.worker
                     .postMessage({

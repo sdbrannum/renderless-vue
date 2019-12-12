@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import RCalendarImpl from '@/components/RCalendar/RCalendar.impl.vue';
-import RSearchImpl from '@/components/RSearch/RSearch.impl.vue';
+import RCalendarImpl from '@/components/calendar/RCalendar.impl.vue';
+import RSearchImpl from '@/components/search/RSearch.impl.vue';
 
 export default {
     name: 'app',

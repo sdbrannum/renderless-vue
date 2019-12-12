@@ -7,6 +7,7 @@
             :paged="true"
             :page="questionsPage"
             :useWorker="true"
+            :threshold="3"
             key="1"
         >
             <template v-slot="{ results, totalResults, isSearching }">
@@ -59,7 +60,7 @@ export default {
     data() {
         return {
             questions: [],
-            questionKeys: [],
+            questionKeys: ['question', 'answer'],
             questionsSearch: '',
             questionsPage: 1,
             todos: [],
@@ -76,7 +77,6 @@ export default {
                 this.todos = await resTodos.json();
                 const resQuestions = await fetch('/jeopardy.json');
                 this.questions = await resQuestions.json();
-                this.questionKeys = ['question', 'answer'];
             } catch (e) {
                 console.error('error >', e);
             }

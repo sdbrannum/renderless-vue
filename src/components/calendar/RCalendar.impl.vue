@@ -17,8 +17,16 @@
             :date="selectedDate"
             :view="viewType"
             :events="events"
+            dayLabelType="abr"
         >
-            <div class="calendar" slot-scope="{ dates }">
+            <div class="calendar" slot-scope="{ dates, dayLabels }">
+                <header>
+                    <div class="days">
+                        <span v-for="dayLabel in dayLabels" :key="dayLabel">{{
+                            dayLabel
+                        }}</span>
+                    </div>
+                </header>
                 <template v-if="viewType === viewTypes.MONTH">
                     <div class="week" v-for="(week, idx) in dates" :key="idx">
                         <div

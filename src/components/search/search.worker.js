@@ -13,9 +13,11 @@ class Comms {
     handleMessage(msg) {
         switch (msg.type.toString()) {
             case msg_type.CONFIG:
+                this.search.keys = msg.payload.keys;
                 this.search.paged = msg.payload.paged;
                 this.search.pageSize = msg.payload.pageSize;
                 this.search.threshold = msg.payload.threshold;
+                this.search.maxDistance = msg.payload.maxDistance;
                 break;
             case msg_type.DATA:
                 this.search.data = msg.payload;
